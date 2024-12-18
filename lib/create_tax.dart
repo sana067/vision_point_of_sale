@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -15,6 +17,7 @@ class _TaxAppState extends State<TaxApp> {
   final FocusNode _taxRateFocusNode = FocusNode();
 
   bool _isNameFieldValid = true;
+  bool _isTaxRateValid = true;
   bool _isButtonEnabled = true;
   String _errorMessage = '';
 
@@ -39,13 +42,37 @@ class _TaxAppState extends State<TaxApp> {
         });
       }
     });
+
     _nameFocusNode.addListener(() {
       setState(() {
         _isNameFieldValid = true;
         _errorMessage = '';
-        _isButtonEnabled = true;
+        _isButtonEnabled = _validateForm();
       });
     });
+  }
+
+  // Function to validate the form fields
+  bool _validateForm() {
+    return _isNameFieldValid &&
+        _isTaxRateValid &&
+        _nameController.text.isNotEmpty &&
+        _taxRateController.text.isNotEmpty;
+  }
+
+  // Function to handle Save button press
+  void _handleSave() {
+    if (_validateForm()) {
+      // Handle save logic here
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Tax Saved Successfully")),
+      );
+    } else {
+      // Show error message if validation fails
+      setState(() {
+        _isButtonEnabled = false;
+      });
+    }
   }
 
   @override
@@ -70,12 +97,15 @@ class _TaxAppState extends State<TaxApp> {
               Padding(
                 padding: EdgeInsets.only(right: 5.w),
                 child: Center(
-                  child: Text(
-                    "SAVE",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
+                  child: GestureDetector(
+                    onTap: _isButtonEnabled ? _handleSave : null,
+                    child: Text(
+                      "SAVE",
+                      style: TextStyle(
+                        color: _isButtonEnabled ? Colors.white : Colors.grey,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -114,6 +144,12 @@ class _TaxAppState extends State<TaxApp> {
                         ),
                       ),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        _isNameFieldValid = value.trim().isNotEmpty;
+                        _isButtonEnabled = _validateForm();
+                      });
+                    },
                   ),
                   if (!_isNameFieldValid)
                     Padding(
@@ -139,7 +175,8 @@ class _TaxAppState extends State<TaxApp> {
                       labelText: "Tax rate, %",
                       labelStyle: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.grey.shade800,
+                        color:
+                            _isTaxRateValid ? Colors.grey.shade800 : Colors.red,
                       ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.green),
@@ -148,6 +185,13 @@ class _TaxAppState extends State<TaxApp> {
                         borderSide: BorderSide(color: Colors.grey.shade400),
                       ),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        _isTaxRateValid =
+                            value.isNotEmpty && double.tryParse(value) != null;
+                        _isButtonEnabled = _validateForm();
+                      });
+                    },
                   ),
 
                   SizedBox(height: 3.h),
