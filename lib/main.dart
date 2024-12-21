@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:vision_point_of_sale/create_cutomer_screen.dart';
+import 'package:vision_point_of_sale/create_printer.dart';
 import 'package:vision_point_of_sale/create_tax.dart';
 import 'package:vision_point_of_sale/modifier_screen.dart';
 import 'package:vision_point_of_sale/pin_screen.dart';
